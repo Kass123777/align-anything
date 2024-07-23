@@ -1,14 +1,14 @@
 {
     "SamplingParams":
     {
-        "n": 2,
+        "n": 1,
         "top_k": 10,
         "top_p": 0.95,
         "temperature": 0.05,
         "max_tokens": 1024,
         "frequency_penalty": 1.2,
-        "prompt_logprobs": 1,
-        "logprobs": 5
+        "prompt_logprobs": 0,
+        "logprobs": 0
     },
     "LLM":
     {

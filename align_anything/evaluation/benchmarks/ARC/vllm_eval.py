@@ -1,36 +1,27 @@
 import os
-os.environ['CUDA_VISIBLE_DEVICES'] = '4, 5, 6, 7'
+os.environ['CUDA_VISIBLE_DEVICES'] = '2, 3'
 
-from align_anything.evaluation.base_vllm import BaseEvaluatorVLLM
+from align_anything.evaluation.eval.base_eval import BaseEval_vllm
+from align_anything.evaluation.inference.base_inference import BaseInferencer_vllm
+from align_anything.evaluation.dataloader.base_dataloader import BaseDataLoader
+from typing import Union, List, Dict, Any, Tuple
 from align_anything.utils.tools import read_eval_cfgs, dict_to_namedtuple
-import json
-from datasets import Dataset, DatasetDict
-from vllm import LLM, SamplingParams
 from align_anything.utils.template_registry import get_template_class
-from datasets import load_dataset
+from align_anything.evaluation.data_type import InferenceInput, InferenceOutput
+from align_anything.evaluation.inference.base_inference import update_results
+from datasets import Dataset
+import json
 
-class TestBenchmark(BaseEvaluatorVLLM):
+class ARCDataLoader(BaseDataLoader):
+
     def get_task_names(self):
-        task_names = [
-            # 'default',
+        if isinstance(self.data_cfgs.task, list):
+            return self.data_cfgs.task
+        else:
+            task_names = [
             self.data_cfgs.task
-        ]
-        return task_names
-
-    def load_dataset(self, task_name):
-        # TODO: 区分online数据集和本地数据集
-        '''
-        filename = os.path.join(self.task_dir)
-        with open(filename, encoding='utf-8') as f:
-            data = [json.loads(x) for x in f.readlines()]
-        dataset = DatasetDict(
-            {
-                'test': Dataset.from_list(data),
-            }
-        )
-        '''
-        dataset = load_dataset(self.task_dir, task_name)
-        return dataset
+            ]
+            return task_names
 
     def get_answer(self, data):
         return data['answerKey']
@@ -48,17 +39,12 @@ class TestBenchmark(BaseEvaluatorVLLM):
                 'answerKey': example['answerKey']
             })
 
-        self.few_shot_data = Dataset.from_dict({
+        return Dataset.from_dict({
             'question': [item['question'] for item in formatted_data],
             'answerKey': [item['answerKey'] for item in formatted_data]
         })
 
     def build_example_prompt(self, data, with_answer=True):
-        print(type(data))
-        print(data)
-        # question = data['question']
-        # choices = " ".join([f"{label}: {text}" for label, text in zip(data['choices']['label'], data['choices']['text'])])
-        # questions = f"Question: {question} Choices: {choices}"
         answer = f'Answer: {self.get_answer(data)}' if with_answer else 'Answer: '
         return f"{data['question']}\n{answer}"
 
@@ -84,31 +70,32 @@ class TestBenchmark(BaseEvaluatorVLLM):
                 question.append(template.system_prompt + template.user_prompt.format(input=prompt + '\n\n'.join(examples)) + template.assistant_prompt.format(output=""))
         
         return question
-        '''
-        template = get_template_class(self.chat_template)
-        question = [template.system_prompt + template.user_prompt.format(input=item['question']) + template.assistant_prompt.format(output="") for item in data]
 
-        return question
-        '''
+class ARCGeneratorVLLM(BaseInferencer_vllm):
 
-    def preproccess(self, data):
-        prompts = self.build_prompt(data)
-        # inputs = self.model.encode(prompts).to(self.device)
-        answers = [self.get_answer(item) for item in data]
-
-        return {
-            "prompt": prompts,
-            "answer": answers,
-        }
+    def eval(self, data:Dict[str, List[InferenceInput]], eval_configs) -> Dict[str, List[InferenceOutput]]:
+        task2details = {}
+        for task, input in data.items():
+            task2details[task] = self.generation(input)
+        
+        output_dir = eval_configs.output_dir
+        brief_filename = eval_configs.brief_filename
+        model_id = self.model_cfgs.model_id
+        detailed_filename = f'{model_id}_detailed'
+        brief_filename = f'{model_id}_brief'
+        update_results(output_dir, brief_filename, detailed_filename,task2details) #这一步可以考虑能不能移到外面，目前是把里面的raw_output写了一下
+        
+        return task2details
 
 def main():
-    # os.environ['CUDA_VISIBLE_DEVICES'] = '4, 5, 6, 7'
     dict_configs, infer_configs = read_eval_cfgs('test_arc')
     dict_configs, infer_configs = dict_to_namedtuple(dict_configs), dict_to_namedtuple(infer_configs)
-    
-    eval_module = TestBenchmark(dict_configs, infer_configs)
-
-    eval_module.eval()
+    model_config = dict_configs.default.model_cfgs
+    eval_configs = dict_configs.default.eval_cfgs
+    dataloader = ARCDataLoader(dict_configs)
+    test_data = dataloader.load_dataset()
+    eval_module = ARCGeneratorVLLM(model_config, infer_configs)
+    eval_module.eval(test_data, eval_configs)
 
 if __name__ == '__main__':
     main()

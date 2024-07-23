@@ -10,7 +10,7 @@ default:
     # Seed for random number generator
     seed: 0
     # Output directory name
-    output_dir: /aifs4su/yaodong/donghai/align-anything/align_anything/evaluation/meta_test_output/mmlu
+    output_dir: /aifs4su/yaodong/panrui/align-anything/align_anything/evaluation/meta_test_output/mmlu
     # Num shot
     n_shot: 5
     # Evaluation method
@@ -18,7 +18,7 @@ default:
   # Configuration for data
   data_cfgs:
     # Task name
-    task: high_school_chemistry
+    task: [high_school_chemistry, high_school_biology]
     # Task directory
     task_dir: cais/mmlu
     # Evaluation split
