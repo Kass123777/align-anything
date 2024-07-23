@@ -26,6 +26,7 @@ from datasets import load_dataset, DatasetDict
 from align_anything.utils.tools import requestoutput_to_dict
 
 from vllm import LLM, SamplingParams, RequestOutput
+import getpass
 
 
 ACTION_GENERATION = 'generation'

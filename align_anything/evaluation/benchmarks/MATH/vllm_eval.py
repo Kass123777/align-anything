@@ -51,9 +51,8 @@ class TestBenchmark(BaseEvaluatorVLLM):
         })
 
     def build_example_prompt(self, data, with_answer=True):
-        problem = data['problem']
         solution = f'Solution: {data["solution"]}' if with_answer else 'Solution: '
-        return f"{problem}\n{solution}"
+        return f"{data['problem']}\n{solution}"
 
     def build_prompt(self, data):
         prompt = f"The following are math questions (with answers).\n\n"
