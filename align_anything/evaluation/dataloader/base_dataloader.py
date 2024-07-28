@@ -46,6 +46,7 @@ class BaseDataLoader:
         self.candidate_labels = self.data_cfgs.candidate_labels
         
         self.task_names = self.get_task_names()
+        self.cot = False
 
         self.init_tokenizer()
 
@@ -74,8 +75,9 @@ class BaseDataLoader:
 
         return prompts, token_ids
 
+
     def set_fewshot_dataset(self, dataset, task: str=None):
-        return None
+
     
     @abstractmethod
     def get_task_names(self)-> List[str]:

@@ -185,7 +185,7 @@ def main():
     for task, _ in raw_outputs.items():
         print('+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++')
         print('task: ', task)
-        print('fwe_shot: ', eval_configs.n_shot)
+        print('few_shot: ', eval_configs.n_shot)
         # print('cot: ', )
         print('-----------------------------------------------------------')
         cnt_match, cnt_sum, true_cases, false_cases = evaluator(raw_outputs[task], dataloader, task)
