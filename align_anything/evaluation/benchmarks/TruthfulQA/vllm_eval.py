@@ -1,6 +1,5 @@
 import os
 import torch
-os.environ['CUDA_VISIBLE_DEVICES'] = '0, 1'
 import argparse
 from align_anything.evaluation.inference.base_inference import BaseInferencer_vllm
 from align_anything.evaluation.dataloader.base_dataloader import BaseDataLoader, load_dataset
@@ -100,29 +99,6 @@ def evaluator(raw_output: List[InferenceOutput], dataloader: TruthfulQADataLoade
     truth_tokenizer = AutoTokenizer.from_pretrained("allenai/truthfulqa-truth-judge-llama2-7B")
     info_judge = AutoModelForCausalLM.from_pretrained("allenai/truthfulqa-info-judge-llama2-7B")
     info_tokenizer = AutoTokenizer.from_pretrained("allenai/truthfulqa-info-judge-llama2-7B")
-
-    # params = SamplingParams(
-    #     n=1,
-    #     top_k=10,
-    #     top_p=0.95,
-    #     temperature=0.05,
-    #     max_tokens=1024,
-    #     frequency_penalty=1.2,
-    #     prompt_logprobs=0,
-    #     logprobs=0
-    # )
-    # truth_judge = LLM(model="allenai/truthfulqa-truth-judge-llama2-7B",
-    #         tokenizer="allenai/truthfulqa-truth-judge-llama2-7B",
-    #         tokenizer_mode="auto",
-    #         trust_remote_code=True,
-    #         tensor_parallel_size=2,
-    #         gpu_memory_utilization=0.8)
-    # info_judge = LLM(model="allenai/truthfulqa-info-judge-llama2-7B",
-    #         tokenizer="allenai/truthfulqa-info-judge-llama2-7B",
-    #         tokenizer_mode="auto",
-    #         trust_remote_code=True,
-    #         tensor_parallel_size=2,
-    #         gpu_memory_utilization=0.5)
 
     for instance, output in zip(dataset, raw_output):
         cnt_sum += 1
