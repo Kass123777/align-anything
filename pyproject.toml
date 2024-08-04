@@ -83,7 +83,6 @@ lint = [
     "pydocstyle[toml]",
     "pyenchant",
     "pre-commit",
-    "vllm",
 ]
 
 [tool.setuptools]
