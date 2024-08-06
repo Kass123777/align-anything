@@ -101,7 +101,7 @@ def main():
         'accuracy': [num_q_match / num_q_sum],
         'num_match_per_picture': [num_pic_match],
         'num_sum_per_picture': [num_pic_sum],
-        'accuracy+': [num_pic_match / num_pic_sum]
+        'accuracy': [num_pic_match / num_pic_sum]
     }
     logger.print_table(title='MME Benchmark', data=output_dict)
 
