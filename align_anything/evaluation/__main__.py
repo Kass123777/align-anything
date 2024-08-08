@@ -46,11 +46,10 @@ def parse_eval_args() -> argparse.Namespace:
         "--benchmark",
         "-b",
         default=None,
-        help="The benchmark you want to test on. Choices: ARC, BBH, Belebele, CMMLU, GSM8K, HumanEval, MMLU, MMLUPRO, mt-bench, PAWS-X, RACE, TruthfulQA, MME, MMBench, MMMU, POPE, MMVet, MathVista",
+        help="The benchmark you want to test on. Choices: ARC, BBH, Belebele, CMMLU, GSM8K, HumanEval, MMLU, MMLUPRO, mt-bench, PAWS-X, RACE, TruthfulQA, MME.",
         choices=[
             "ARC", "BBH", "Belebele", "CMMLU", "GSM8K", "HumanEval",
-            "MMLU", "MMLUPRO", "mt_bench", "PAWS-X", "RACE", "TruthfulQA",
-            "MME", "MMBench", "MMMU", "POPE", "MMVet", "MathVista"
+            "MMLU", "MMLUPRO", "mt_bench", "PAWS-X", "RACE", "TruthfulQA", "MME"
         ]
     )
     parser.add_argument(
@@ -160,7 +159,7 @@ def run_benchmark(file_path, args):
                 args_list.append(f"--{key}")
                 args_list.append(str(value))
 
-        command = f"sh {sh_file_path} {' '.join(args_list)}"
+        command = f"bash {sh_file_path} {' '.join(args_list)}"
         os.system(command)
         print(f"{file_path} executed successfully with arguments {args}.")
     except subprocess.CalledProcessError as e:
