@@ -161,7 +161,7 @@ def run_benchmark(file_path, args):
                 args_list.append(f"--{key}")
                 args_list.append(str(value))
 
-        command = f"sh {sh_file_path} {' '.join(args_list)}"
+        command = f"bash {sh_file_path} {' '.join(args_list)}"
         os.system(command)
         print(f"{file_path} executed successfully with arguments {args}.")
     except subprocess.CalledProcessError as e:
